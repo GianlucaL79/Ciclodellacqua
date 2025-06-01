@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ciclo dell'Acqua Animato</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif; /* Modern and clean font */
+      overflow: hidden;
+      height: 100vh;
+      display: flex; /* To center content if necessary */
+      justify-content: center;
+      align-items: center;
+      /* Body background is now handled by .water-cycle-container */
+    }
+
+    /* Main container for the full-screen animation */
+    .water-cycle-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      /* Sky background here */
+      background: linear-gradient(to bottom, #87CEEB 0%, #B2EBF2 50%, #E0F7FA 100%);
+    }
+
+    /* Sun */
+    .sole {
+      position: absolute;
+      top: 40px;
+      right: 60px;
+      width: 120px; /* Increased for more impact */
+      height: 120px;
+      background: radial-gradient(circle, #FFDE00, #FFA500);
+      border-radius: 50%;
+      box-shadow: 0 0 60px rgba(255, 215, 0, 0.9); /* More intense shadow */
+      animation: pulse 2.5s infinite alternate; /* Pulsing animation */
+      z-index: 10;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 60px rgba(255, 200, 0, 0.7); }
+      100% { transform: scale(1.07); box-shadow: 0 0 80px rgba(255, 220, 50, 1); }
+    }
+
+    /* Sun rays */
+    .ray {
+      position: absolute;
+      background: linear-gradient(to right, #FFD700, rgba(255, 215, 0, 0)); /* Gradient for rays */
+      width: 80px; /* Ray length */
+      height: 5px;
+      border-radius: 2.5px;
+      top: calc(50% - 2.5px); /* Vertically center relative to the sun */
+      left: 50%; /* Starts from the horizontal center of the sun */
+      transform-origin: 0% 50%; /* Rotates around its left edge (which is the center of the sun) */
+      opacity: 0.85;
+      animation-name: rayGrow;
+      animation-duration: 1.8s;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+      /* Transformations and delay are now handled directly here using CSS variables */
+      transform: rotate(var(--ray-rotation)) translateX(60px); /* Rotate and then translate outwards */
+      animation-delay: var(--ray-delay);
+    }
+
+    @keyframes rayGrow {
+      0% { width: 75px; opacity: 0.7; }
+      50% { width: 95px; opacity: 1; }
+      100% { width: 75px; opacity: 0.7; }
+    }
+
+    /* Sea (Ocean) */
+    .mare {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 150px; /* Increased height for more impact */
+      background: linear-gradient(to top, #00425A, #0077BE, #149ECA); /* Richer gradient */
+      border-top: 10px solid #00334E; /* Thicker border */
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .mare::before, .mare::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 200%; /* Double width for wave animation */
+      height: 60px;
+      background: rgba(255, 255, 255, 0.2); /* More visible waves */
+      border-radius: 50%;
+      animation: wave 6s ease-in-out infinite alternate;
+    }
+    .mare::before {
+      top: -30px;
+      opacity: 0.8;
+    }
+    .mare::after {
+      top: -20px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.15);
+      animation-duration: 8s;
+      animation-direction: alternate-reverse;
+      z-index: -1;
+    }
+
+    @keyframes wave {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Landscape (contains mountain, river, trees) */
+    .landscape {
+      position: absolute;
+      bottom: 150px; /* Positioned above the sea */
+      left: 0;
+      width: 100%;
+      height: calc(100% - 150px); /* Fills the remaining space above the sea */
+      background: linear-gradient(to top, #6B4F2F, #9E8A70); /* Earth gradient */
+      z-index: 0; /* Below other moving elements */
+      overflow: hidden; /* Important for containing internal elements */
+    }
+
+    /* Mountain */
+    .montagna {
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      width: 0;
+      height: 0;
+      border-left: 150px solid transparent; /* Wider base */
+      border-right: 150px solid transparent;
+      border-bottom: 250px solid #7C6D5F; /* More natural color */
+      border-radius: 15px 15px 5px 5px; /* Softer corners */
+      filter: drop-shadow(3px -3px 8px rgba(0,0,0,0.25)); /* Shadow for depth */
+      z-index: 2; /* Above the sea */
+      transform: translateX(-50%); /* Center */
+    }
+
+    .montagna::before { /* Snow on the peak */
+      content: '';
+      position: absolute;
+      top: -20px; /* Above the mountain */
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-left: 60px solid transparent;
+      border-right: 60px solid transparent;
+      border-bottom: 80px solid #F0F8FF; /* Snow color */
+      transform: translateX(-50%);
+      z-index: 3;
+      border-radius: 50% 50% 0 0; /* Rounded shape for snow */
+    }
+
+    /* River */
+    .fiume {
+      position: absolute;
+      bottom: 0; /* Starts from the bottom edge of the landscape */
+      left: 18%; /* Initial position */
+      width: 60px; /* Wider */
+      height: 250px; /* Taller */
+      background: #4682B4; /* Solid base color to avoid gradient artifacts */
+      clip-path: polygon(0 0, 100% 10%, 80% 100%, 20% 100%);
+      opacity: 0.9; /* More opaque */
+      z-index: 3; /* Above the background mountain */
+      filter: brightness(0.95);
+      overflow: hidden; /* Important for containing the internal flow */
+    }
+
+    .fiume::before { /* River flow as an animated pseudo-element */
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 200%; /* Double height for vertical animation */
+      background: repeating-linear-gradient(
+          to bottom, /* Vertical animation */
+          #64B5F6,
+          #64B5F6 15px,
+          #42A5F5 15px,
+          #42A5F5 30px
+      );
+      background-size: 100% 60px; /* Stripe size */
+      animation: flussoInternoFiume 4s linear infinite; /* Smoother animation */
+    }
+
+    @keyframes flussoInternoFiume {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-60px); } /* Scrolls by one stripe size */
+    }
+
+    /* Trees */
+    .tree {
+      position: absolute;
+      bottom: 0; /* Starts from the bottom edge of the landscape */
+      z-index: 4;
+    }
+    .tree::before { /* Trunk */
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: 18px;
+      height: 55px;
+      background-color: #795548;
+      border-radius: 4px 4px 0 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .tree::after { /* Foliage */
+      content: '';
+      position: absolute;
+      bottom: 45px;
+      width: 65px;
+      height: 85px;
+      background: radial-gradient(circle, #388E3C, #2E7D32, #1B5E20);
+      border-radius: 50% 50% 35% 35% / 60% 60% 40% 40%;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: inset 0 -5px 10px rgba(0,0,0,0.2), 0 2px 5px rgba(0,0,0,0.15);
+    }
+    .tree-1 { left: 15%; transform: scale(0.95); }
+    .tree-2 { left: 82%; }
+    .tree-3 {
+      left: 55%;
+      transform: scale(0.85);
+      bottom: -10px;
+      z-index: 3;
+      opacity: 0.9;
+    }
+    .tree-3::after { background: radial-gradient(circle, #4CAF50, #388E3C, #2E7D32); }
+
+    /* Vapor (evaporation bubbles) */
+    .vapore {
+      position: absolute;
+      bottom: 150px; /* Starts above the sea */
+      width: 15px; /* Larger */
+      height: 15px;
+      background: rgba(255, 255, 255, 0.7); /* More opaque */
+      border-radius: 50%; /* Bubble shape */
+      animation: salitaVapore 3.5s infinite ease-out; /* Smoother and longer animation */
+      box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Shadow for depth */
+      z-index: 4; /* Above the river and mountains */
+    }
+
+    @keyframes salitaVapore {
+      0% { transform: translateY(0) scale(0.2); opacity: 0; }
+      20% { opacity: 0.8; }
+      100% { transform: translateY(-250px) scale(1.2); opacity: 0; } /* Rises higher */
+    }
+
+    /* Cloud */
+    .nuvola {
+      position: absolute;
+      top: 100px; /* Lower and visible initial position */
+      width: 200px; /* Wider */
+      height: 80px; /* Taller */
+      background: radial-gradient(circle, #FFFFFF 70%, #F0F8FF 100%); /* Cloud gradient */
+      border-radius: 50px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), inset 0 -5px 10px rgba(0,0,0,0.05); /* More pronounced shadow */
+      animation: floatCloud 25s linear infinite, cloudGrow 5s infinite alternate; /* Combined animations */
+      z-index: 9; /* Above all landscape */
+      opacity: 0.95;
+    }
+
+    .nuvola::before, .nuvola::after {
+      content: '';
+      position: absolute;
+      background: inherit;
+      border-radius: 50%;
+      box-shadow: inherit;
+      opacity: 0.9;
+    }
+    .nuvola::before { /* Left bump */
+      width: 100px; height: 100px; top: -40px; left: 30px;
+    }
+    .nuvola::after { /* Right bump */
+      width: 80px; height: 80px; top: -15px; right: 20px;
+    }
+
+    @keyframes floatCloud {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(calc(100vw + 600px)); } /* Clouds move completely off-screen */
+    }
+    @keyframes cloudGrow {
+      0%   { transform: scale(0.97); opacity: 0.9; filter: brightness(100%); }
+      50%  { transform: scale(1.03); opacity: 1;   filter: brightness(90%); } /* Slightly darker */
+      100% { transform: scale(0.97); opacity: 0.9; filter: brightness(100%); }
+    }
+
+    /* Rain */
+    .pioggia {
+      position: absolute;
+      width: 4px; /* Thicker */
+      height: 25px; /* Longer */
+      background: linear-gradient(to bottom, #6495ED, #4169E1); /* Gradient for drops */
+      border-radius: 0 50% 50% 50% / 60% 60% 40% 40%; /* Drop shape */
+      transform: translateY(0) rotate(8deg); /* Tilt */
+      opacity: 0; /* Starts invisible */
+      animation: caduta 1.2s linear forwards; /* Falling animation */
+      box-shadow: 0 0 5px rgba(65, 105, 225, 0.5); /* Small shadow for drops */
+      z-index: 8; /* Below clouds but above landscape */
+    }
+
+    @keyframes caduta {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(500px); opacity: 0; } /* Falls for a fixed distance */
+    }
+
+    /* Styles for the text box and controls */
+    .text-box {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px 20px;
+      border-radius: 15px;
+      max-width: 350px;
+      font-size: 1.1em;
+      color: #333;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      z-index: 100;
+      line-height: 1.5;
+    }
+
+    /* Controls are removed as per user request */
+    /*
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .controls button {
+      padding: 12px 20px;
+      font-size: 1em;
+      border: none;
+      background: #1e90ff;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.1s ease;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+
+    .controls button:hover {
+      background: #104e8b;
+      transform: translateY(-2px);
+    }
+
+    .controls button:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    */
+
+  </style>
+</head>
+<body>
+
+  <div class="water-cycle-container">
+    <div class="sole">
+      <div class="ray" style="--ray-rotation: 0deg; --ray-delay: 0s;"></div>
+      <div class="ray" style="--ray-rotation: 45deg; --ray-delay: 0.15s;"></div>
+      <div class="ray" style="--ray-rotation: 90deg; --ray-delay: 0.3s;"></div>
+      <div class="ray" style="--ray-rotation: 135deg; --ray-delay: 0.45s;"></div>
+      <div class="ray" style="--ray-rotation: 180deg; --ray-delay: 0.6s;"></div>
+      <div class="ray" style="--ray-rotation: 225deg; --ray-delay: 0.75s;"></div>
+      <div class="ray" style="--ray-rotation: 270deg; --ray-delay: 0.9s;"></div>
+      <div class="ray" style="--ray-rotation: 315deg; --ray-delay: 1.05s;"></div>
+    </div>
+
+    <div class="mare"></div>
+
+    <div class="landscape">
+      <div class="montagna"></div>
+      <div class="fiume"></div>
+      <div class="tree tree-1"></div>
+      <div class="tree tree-2"></div>
+      <div class="tree tree-3"></div>
+    </div>
+
+    <div class="nuvola" id="nuvola1" style="left: -200px;"></div>
+
+    <div class="rain-drops-container"></div>
+    <div class="evaporation-bubbles-container"></div>
+    <div class="condensation-particles-container"></div>
+  </div>
+
+  <div class="text-box" id="infoBox">
+    </div>
+
+  <!--
+  <div class="controls">
+    <button onclick="showStep(0)">1. Evaporazione</button>
+    <button onclick="showStep(1)">2. Condensazione</button>
+    <button onclick="showStep(2)">3. Precipitazione</button>
+    <button onclick="showStep(3)">4. Raccolta</button>
+  </div>
+  -->
+
+  <script>
+    const steps = [
+      "🌞 **1. Evaporazione:** Il sole riscalda l'acqua di oceani, laghi e fiumi. L'acqua si trasforma in vapore acqueo e sale nell'atmosfera.",
+      "☁️ **2. Condensazione:** Il vapore acqueo sale, si raffredda e si trasforma in minuscole goccioline d'acqua o cristalli di ghiaccio, formando le nuvole.",
+      "🌧️ **3. Precipitazione:** Quando le nuvole diventano troppo pesanti, l'acqua cade sulla terra sotto forma di pioggia, neve o grandine.",
+      "🌊 **4. Raccolta:** L'acqua precipitata si raccoglie in fiumi, laghi, oceani o penetra nel terreno, ricominciando il ciclo."
+    ];
+
+    let currentStepIndex = 0; // Keep track of the current step
+
+    function updateInfoBox() {
+      document.getElementById("infoBox").innerHTML = steps[currentStepIndex];
+      currentStepIndex = (currentStepIndex + 1) % steps.length; // Move to the next step, loop back to 0 if at the end
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const nuvola = document.getElementById("nuvola1");
+      const rainDropsContainer = document.querySelector('.rain-drops-container');
+      const evaporationBubblesContainer = document.querySelector('.evaporation-bubbles-container');
+      const condensationParticlesContainer = document.querySelector('.condensation-particles-container');
+      const mare = document.querySelector('.mare'); // Reference to the sea for bubbles
+
+      let posizioneNuvola = -200;
+      const larghezzaSchermo = window.innerWidth;
+      const velocitaNuvola = 0.8;
+
+      function animaNuvola() {
+        posizioneNuvola += velocitaNuvola;
+        if (posizioneNuvola > larghezzaSchermo + 200) {
+          posizioneNuvola = -200;
+        }
+        nuvola.style.left = posizioneNuvola + "px";
+
+        // Add rain from under the cloud as it moves
+        if (Math.random() < 0.2) { /* Reduced frequency for a more natural effect */
+          const goccia = document.createElement("div");
+          goccia.className = "pioggia";
+          // Position the drop based on the current cloud position
+          const nuvolaRect = nuvola.getBoundingClientRect();
+          const offset = Math.random() * (nuvolaRect.width * 0.8) + (nuvolaRect.width * 0.1); /* Inside the cloud */
+          goccia.style.left = (nuvolaRect.left + offset) + "px";
+          goccia.style.top = (nuvolaRect.bottom - 10) + "px"; /* Just below the cloud */
+          document.body.appendChild(goccia); /* Add to body to not be clipped by the container */
+
+          setTimeout(() => {
+            goccia.remove();
+          }, 1200); /* Rain animation duration */
+        }
+
+        requestAnimationFrame(animaNuvola);
+      }
+
+      // Function to create an evaporation bubble
+      function createEvaporationBubble() {
+        const bubble = document.createElement("div");
+        bubble.className = "vapore"; /* Reuse vapor class */
+        const mareRect = mare.getBoundingClientRect();
+        bubble.style.left = (mareRect.left + Math.random() * mareRect.width * 0.8 + mareRect.width * 0.1) + 'px';
+        bubble.style.bottom = (mareRect.height * Math.random() * 0.2) + 'px'; /* Starts near the sea surface */
+        
+        bubble.style.width = bubble.style.height = (Math.random() * 10 + 5) + 'px';
+        bubble.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
+        bubble.style.animationDelay = (Math.random() * 1.5) + 's';
+        document.body.appendChild(bubble);
+
+        bubble.addEventListener('animationend', () => {
+          bubble.remove();
+        });
+      }
+
+      // Function to create condensation particles (new element)
+      function createCondensationParticle() {
+        if (nuvola) { // If the cloud exists
+          const nuvolaRect = nuvola.getBoundingClientRect();
+          const particle = document.createElement('div');
+          particle.classList.add('condensation-particle');
+          const offsetX = (Math.random() - 0.5) * nuvolaRect.width * 0.7;
+          const offsetY = (Math.random() - 0.5) * nuvolaRect.height * 0.7;
+
+          particle.style.left = (nuvolaRect.left + nuvolaRect.width / 2 + offsetX) + 'px';
+          particle.style.top = (nuvolaRect.top + nuvolaRect.height / 2 + offsetY) + 'px';
+          
+          particle.style.width = particle.style.height = (Math.random() * 5 + 2) + 'px';
+          particle.style.animationDuration = (Math.random() * 1.0 + 1.5) + 's';
+          particle.style.animationDelay = (Math.random() * 0.8) + 's';
+          document.body.appendChild(particle);
+
+          particle.addEventListener('animationend', () => {
+            particle.remove();
+          });
+        }
+      }
+
+      // Start animations
+      animaNuvola();
+      setInterval(createEvaporationBubble, 200); /* Evaporation bubbles frequency */
+      setInterval(createCondensationParticle, 10000000); /* Condensation particles frequency */
+
+      // Start automatic step display
+      updateInfoBox(); // Display the first step immediately
+      setInterval(updateInfoBox, 5000); // Change step every 5 seconds
+    });
+  </script>
+</body>
+</html>
